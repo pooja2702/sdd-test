@@ -27,6 +27,8 @@ Note: _This is purely the output of the chat conversation and does not contain a
 @[/speckit.clarify]add a poll capablity when the pipeline is running until there is a success/failure to report back
 
 
+### Planner Response
+
 **Question 1 of 1: Polling Interval**
 
 **Recommended:** Option B — 15 seconds strikes the right balance: frequent enough to feel responsive, but infrequent enough to avoid excessive requests to the GitLab server (important for self-hosted instances with rate limits).
@@ -67,20 +69,6 @@ Got it — **15-second polling interval**. Let me integrate this into the spec.
 | **Auth** | `GITLAB_TOKEN` env var | Standard CI/CD pattern; **never logged** |
 | **Polling** | 15-second intervals with `rich` spinner | Per spec; indefinite until terminal state |
 
-### Project Structure
-
-```
-src/
-├── cli.py              # Click entry point (cicd mr / pipeline / run)
-├── config.py           # Config from env vars
-├── gitlab_client.py    # python-gitlab wrapper
-├── merge_request.py    # MR creation & lookup
-├── pipeline.py         # Pipeline status, trigger, poll
-├── git_utils.py        # Branch detection, push, commit
-└── output.py           # Rich formatting
-
-tests/                  # Mirrors src/ with pytest
-```
 
 
 ### User Input
@@ -90,19 +78,6 @@ tests/                  # Mirrors src/ with pytest
 ### User Input
 
 @[/speckit.tasks]
-
-### Planner Response
-
-I'll run the `/speckit.tasks` workflow. Let me start with the prerequisites check and then load all design documents.
-
-I now have all design documents loaded. Let me synthesize and generate the tasks. The constitution requires tests (`II. Testing`), so test tasks are included.
-
-**Key mappings:**
-- **US1** (P1): Merge Request creation → `git_utils.py`, `merge_request.py`, `cli.py` (mr command), `output.py`
-- **US2** (P1): Pipeline status → `pipeline.py`, `cli.py` (pipeline command), `output.py`
-- **US3** (P2): Combined workflow → `cli.py` (run command) — composes US1 + US2
-- **Shared/Foundational**: `config.py`, `gitlab_client.py`, `git_utils.py` (core), `output.py` (base), custom exceptions, `conftest.py`
-
 
 ### Planner Response
 
@@ -118,36 +93,7 @@ I now have all design documents loaded. Let me synthesize and generate the tasks
 | **Phase 5: US3 — Combined Workflow** | 2 tasks (1 test suite + 1 implementation) |
 | **Phase 6: Polish** | 5 tasks |
 
-### Task Count Per User Story
 
-| Story | Tests | Implementation | Total |
-|-------|-------|----------------|-------|
-| **Foundational** (shared) | 4 | 7 | 11 |
-| **US1** — Create MR (P1) | 2 | 4 | 6 |
-| **US2** — Pipeline Status (P1) | 3 | 5 | 8 |
-| **US3** — Combined (P2) | 1 | 1 | 2 |
-
-### Parallel Opportunities
-
-- **Setup**: T003 ∥ T004
-- **Foundational**: T006 ∥ T007 (implementations); T012 ∥ T013 ∥ T014 ∥ T015 (tests)
-- **US1 ∥ US2**: Phases 3 and 4 can run entirely in parallel after Phase 2
-- **US1 tests**: T016 ∥ T017; **US2 tests**: T022 ∥ T023 ∥ T024
-
-### Independent Test Criteria
-
-- **US1**: `cicd mr` creates or reports MR independently
-- **US2**: `cicd pipeline` fetches, triggers, and polls pipelines independently
-- **US3**: `cicd run` combines both into a single command
-
-### MVP Scope
-
-**User Story 1 only** (Phases 1-3, 21 tasks) delivers a working `cicd mr` command.
-
-### Format Validation
-
-✅ All 36 tasks follow the checklist format: `- [ ] [TaskID] [P?] [Story?] Description with file path`
-
-### Suggested Next Step
+#### Suggested Next Step
 
 Run **`/speckit.implement`** to begin executing the tasks, or **`/speckit.analyze`** to validate cross-artifact consistency before implementation.
